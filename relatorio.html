@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de Reclamações</title>
+    <style>
+        /* Estilo Global */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Container Principal */
+        .container {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Títulos */
+        h2 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        /* Tabela */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #444;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 10px;
+        }
+
+        /* Botões */
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .voltar-btn {
+            background-color: #f44336;
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            display: inline-block;
+            text-align: center;
+            border-radius: 5px;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .voltar-btn:hover {
+            background-color: #e53935;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Relatório de Reclamações</h2>
+
+        <!-- Tabela de Reclamações -->
+        <table id="tabelaReclamacoes">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Modelo</th>
+                    <th>Data</th>
+                    <th>Descrição</th>
+                    <th>Solução</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaReclamacoesBody">
+                <!-- As reclamações serão inseridas aqui via JavaScript -->
+            </tbody>
+        </table>
+
+        <!-- Botões -->
+        <button onclick="exportarParaExcel()">Exportar para Excel</button>
+        <a href="index.html" class="voltar-btn">Voltar</a>
+    </div>
+
+    <script>
+        // Função para buscar reclamações do banco de dados
+        async function carregarReclamacoes() {
+            const resposta = await fetch("https://reclamacoes.vercel.app");
+            const reclamacoes = await resposta.json();
+
+            // Preencher a tabela com os dados das reclamações
+            const tabela = document.getElementById("tabelaReclamacoesBody");
+            tabela.innerHTML = ""; // Limpa a tabela antes de preencher
+
+            reclamacoes.forEach(reclamacao => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${reclamacao.id}</td>
+                    <td>${reclamacao.modelo}</td>
+                    <td>${reclamacao.data}</td>
+                    <td>${reclamacao.descricao}</td>
+                    <td>${reclamacao.solucao}</td>
+                `;
+                tabela.appendChild(tr);
+            });
+        }
+
+        // Função para exportar a tabela para Excel
+        function exportarParaExcel() {
+            const tabela = document.getElementById("tabelaReclamacoes");
+            const wb = XLSX.utils.table_to_book(tabela, { sheet: "Reclamações" });
+            XLSX.writeFile(wb, "relatorio_reclamacoes.xlsx");
+        }
+
+        // Carregar as reclamações quando a página for carregada
+        window.onload = carregarReclamacoes;
+    </script>
+
+</body>
+</html>
